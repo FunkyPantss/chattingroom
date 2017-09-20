@@ -12,14 +12,14 @@ class chat():
         message = self.textpad.get(1.0, END)
         print(message)
         try:
-            self.tcpCliSock.send(message.encode('utf-8'))
+            session.chat_tcpCliSock.send(message.encode('utf-8'))
         except:
             print('发送消息失败')
 
     def receive(self):
         while True:
             try:
-                message = self.tcpCliSock.recv(1024)
+                message = session.chat_tcpCliSock.recv(1024)
                 if not message:
                     break
                 else:  # 接收到了消息，在这里进行处理，显示
@@ -38,24 +38,25 @@ class chat():
 
     def file(self):#传送文件，调用file_client的内容
         filename = tkinter.filedialog.askopenfilename()#defaultextension='.txt'
-        file_client.send_file(filename.name, self.tcpCliSock)
+        file_client.send_file(filename.name, session.chat_tcpCliSock)
 
     def __init__(self):
-        HOST = '127.0.0.1'
-        PORT = 44444
-        BUFFERSIZE = 1024
-        ADDR = (HOST, PORT)
+        #         HOST = '127.0.0.1'
+        # PORT = 44444
+        # BUFFERSIZE = 1024
+        # ADDR = (HOST, PORT)
 
-        try:
-            self.tcpCliSock = socket(AF_INET, SOCK_STREAM)
-            self.tcpCliSock.connect(ADDR)
-        except:
-            print('连接服务器出错')
+        # try:
+        #     session.chat_tcpCliSock = socket(AF_INET, SOCK_STREAM)
+        #     session.chat_tcpCliSock.connect(ADDR)
+        # except:
+        #     print('连接服务器出错')
+
 
         # 向服务器发送第一条消息，使用格式userid:friendid
         userid_friendid = session.USER_ID + ':' + session.FRIEND_ID
         try:
-            self.tcpCliSock.send(userid_friendid.encode('utf-8'))
+            session.chat_tcpCliSock.send(userid_friendid.encode('utf-8'))
         except Exception as e:
             print(e)
             print('发送好友名称出错')

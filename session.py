@@ -6,6 +6,9 @@ USER_NAME = ''
 FRIEND_NAME = '11111'
 FRIEND_ID = '1'
 
+chat_tcpCliSock = ''
+file_tcpCliSock = ''
+
 # 连接数据库
 connect = pymysql.Connect(
     host='localhost',

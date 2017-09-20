@@ -5,6 +5,7 @@ import tkinter.messagebox
 import session
 import pymysql
 import time
+from GUI import connect_to_server
 
 class login():
     def denglu(self):
@@ -12,6 +13,8 @@ class login():
         passwd = self.entry_passwd.get()
         if login_code.login(user_id, passwd):#登录成功,进入下一个界面
             self.root.destroy()
+            #在登录成功后就先连接聊天服务器和文件服务器
+            connect_to_server.connect()
             friend_list.top()
 
         else:#登录失败
