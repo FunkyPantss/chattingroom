@@ -112,7 +112,9 @@ class login():
         self.label_id = Label(self.frame_function, text='账号:')
         self.label_id.grid(row=1,column=0)
         self.entry_id = Entry(self.frame_function)
+        self.entry_id.focus_set()
         self.entry_id.grid(row=1,column=1)
+
 
         #用户名(先定义，在这里不显示,应显示在第二行）
         self.label_username = Label(self.frame_function, text='用户名：')

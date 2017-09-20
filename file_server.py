@@ -43,7 +43,7 @@ def recv_file(id, tcpCliSock_i):
         file_name, file_size, md5_recv = unpack_file_info(file_info_package)
 
         recved_size = 0
-        with open('./server_file/' + file_name, 'wb') as fw:
+        with open(file_name.decode('utf-8'), 'wb') as fw:
             while recved_size < file_size:
                 remained_size = file_size - recved_size
                 recv_size = BUFFERSIZE if remained_size > BUFFERSIZE else remained_size
@@ -74,8 +74,7 @@ def p2p(id, recv_stream):
             print(e)
             print('p2p出错')
     else:
-        print('目标机不在线')
-        return False
+        pass#服务器继续存文件
 
 def is_online(id):#给出一个ID判断其是否在线，如果在线返回True
     if id in user_online.keys():
