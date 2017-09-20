@@ -1,4 +1,5 @@
 from socket import *
+import session
 
 
 HOST = '127.0.0.1'
@@ -13,21 +14,22 @@ CHAT_CONNECTED = False
 FILE_CONNECTED = False
 
 def connect():
-    while CHAT_CONNECTED is False:
+    while True:
         try:
-            chat_tcpCliSock = socket(AF_INET, SOCK_STREAM)
-            chat_tcpCliSock.connect(CHAT_ADDR)
-            CONNECTED = True
+            session.chat_tcpCliSock = socket(AF_INET, SOCK_STREAM)
+            session.chat_tcpCliSock.connect(CHAT_ADDR)
             print('成功连接到聊天服务器')
-        except:
+            break
+        except Exception as e:
+            print(e)
             print('连接聊天服务器时出错')
 
-    while FILE_CONNECTED is False:
+    while True:
         try:
-            file_tcpCliSock = socket(AF_INET, SOCK_STREAM)
-            file_tcpCliSock.connect(FILE_ADDR)
-            CONNECTED = True
+            session.file_tcpCliSock = socket(AF_INET, SOCK_STREAM)
+            session.file_tcpCliSock.connect(FILE_ADDR)
             print('成功连接到文件服务器')
+            break
         except:
             print('连接文件服务器时出错')
 

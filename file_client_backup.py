@@ -1,4 +1,5 @@
 #-*- coding=utf-8 -*-
+import socket
 import os
 import hashlib
 import struct
@@ -44,7 +45,7 @@ def send_file_to_server(file_path, tcpCliSock):
     finally:
         print("Closing connect")
 
-def send_file(file_path, tcpCliSock):#首先调用这个函数
+def send_file(file_path, tcpCliSock):
     if not file_path:
-        print('未选择文件')
-    send_file_to_server(file_path, tcpCliSock)
+        print('请输入文件名')
+    send_file_to_server()

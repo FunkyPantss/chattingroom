@@ -11,15 +11,18 @@ class login():
     def denglu(self):
         user_id = self.entry_id.get()
         passwd = self.entry_passwd.get()
-        if login_code.login(user_id, passwd):#登录成功,进入下一个界面
-            self.root.destroy()
-            #在登录成功后就先连接聊天服务器和文件服务器
-            connect_to_server.connect()
-            friend_list.top()
+        while user_id != '' and passwd != '':
+            user_id = self.entry_id.get()
+            passwd = self.entry_passwd.get()
+            if login_code.login(user_id, passwd):#登录成功,进入下一个界面
+                self.root.destroy()
+                #在登录成功后就先连接聊天服务器和文件服务器
+                connect_to_server.connect()
+                friend_list.top()
 
-        else:#登录失败
-            tkinter.messagebox.showerror('登录失败', '账号或密码错误，请重新输入')
-            pass
+            else:#登录失败
+                tkinter.messagebox.showerror('登录失败', '账号或密码错误，请重新输入')
+                pass
 
 
     def register(self):

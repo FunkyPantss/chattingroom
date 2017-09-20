@@ -35,7 +35,6 @@ def unpack_file_info(file_info):
 
 
 def recv_file(id, tcpCliSock_i):
-
     try:
         #这里是文件头，需要先将文件头转发到目标端
         file_info_package = tcpCliSock.recv(info_size)
@@ -44,7 +43,7 @@ def recv_file(id, tcpCliSock_i):
         file_name, file_size, md5_recv = unpack_file_info(file_info_package)
 
         recved_size = 0
-        with open(file_name, 'wb') as fw:
+        with open('./server_file/' + file_name, 'wb') as fw:
             while recved_size < file_size:
                 remained_size = file_size - recved_size
                 recv_size = BUFFERSIZE if remained_size > BUFFERSIZE else remained_size
@@ -54,9 +53,11 @@ def recv_file(id, tcpCliSock_i):
                 #添加转发的部分
                 p2p(id, recv_file)
         md5 = cal_md5(file_name)
-        if md5 != md5_recv.decode:
-            print('md5' + md5)
-            print('reve' + md5_recv.decode('utf-8'))
+        if md5 != md5_recv.decode('utf-8'):
+            print(type(md5))
+            print(type(md5_recv.decode('utf-8')))
+            print('md5：' + md5)
+            print('recv：' + md5_recv.decode('utf-8'))
             print('MD5 compared fail!')
         else:
             print('Received successfully')
@@ -72,6 +73,9 @@ def p2p(id, recv_stream):
         except Exception as e:
             print(e)
             print('p2p出错')
+    else:
+        print('目标机不在线')
+        return False
 
 def is_online(id):#给出一个ID判断其是否在线，如果在线返回True
     if id in user_online.keys():

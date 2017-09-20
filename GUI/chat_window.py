@@ -5,6 +5,7 @@ import session
 from socket import *
 import time
 import file_client
+import cilent_recv_file
 
 
 class chat():
@@ -16,7 +17,7 @@ class chat():
         except:
             print('发送消息失败')
 
-    def receive(self):
+    def receive_message(self):
         while True:
             try:
                 message = session.chat_tcpCliSock.recv(1024)
@@ -36,12 +37,17 @@ class chat():
                 break
 
 
-    def file(self):#传送文件，调用file_client的内容
-        filename = tkinter.filedialog.askopenfilename()#defaultextension='.txt'
-        file_client.send_file(filename.name, session.chat_tcpCliSock)
+    def send_file(self):
+        filename = tkinter.filedialog.askopenfile()  # defaultextension='.txt'
+        file_client.send_file(filename.name, session.file_tcpCliSock)
+
+
+    def receive_file(self):
+        cilent_recv_file.recv()
+
 
     def __init__(self):
-        #         HOST = '127.0.0.1'
+        # HOST = '127.0.0.1'
         # PORT = 44444
         # BUFFERSIZE = 1024
         # ADDR = (HOST, PORT)
@@ -57,12 +63,13 @@ class chat():
         userid_friendid = session.USER_ID + ':' + session.FRIEND_ID
         try:
             session.chat_tcpCliSock.send(userid_friendid.encode('utf-8'))
+            session.file_tcpCliSock.send(userid_friendid.encode('utf-8'))
         except Exception as e:
             print(e)
             print('发送好友名称出错')
 
         # 创建接受消息线程
-        self.thread_receive = threading.Thread(target=self.receive, args=(), name=session.FRIEND_NAME)
+        self.thread_receive = threading.Thread(target=self.receive_message, args=(), name=session.FRIEND_NAME)
         self.thread_receive.start()
 
         self.root = Tk()
@@ -101,7 +108,7 @@ class chat():
         # self.button_emoji.grid(row=0, column=1)
         self.button_emoji.pack(side=LEFT, fill=Y)
 
-        self.button_file = Button(self.lable_function, text='文件', bd=1, bg='white', command=file)
+        self.button_file = Button(self.lable_function, text='文件', bd=1, bg='white', command=self.send_file)
         # self.button_file.grid(row=0, column=2)
         self.button_file.pack(side=LEFT, fill=Y)
 
