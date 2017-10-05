@@ -21,3 +21,5 @@ connect = pymysql.Connect(
 
 # 获取游标
 CURSOR = connect.cursor()
+
+emoji = ''

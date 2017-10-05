@@ -37,7 +37,7 @@ def unpack_file_info(file_info):
 def recv_file(id, tcpCliSock_i):
     try:
         #这里是文件头，需要先将文件头转发到目标端
-        file_info_package = tcpCliSock.recv(info_size)
+        file_info_package = tcpCliSock_i.recv(info_size)
         tcpCliSock_i.send(file_info_package)
         #解包
         file_name, file_size, md5_recv = unpack_file_info(file_info_package)
@@ -84,6 +84,7 @@ def is_online(id):#给出一个ID判断其是否在线，如果在线返回True
 
 
 if __name__ == '__main__':
+
     print('文件服务器正在等待客户端连接...')
     while True:
         tcpCliSock, addr = tcpSerSock.accept()

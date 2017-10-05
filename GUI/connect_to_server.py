@@ -1,5 +1,6 @@
 from socket import *
 import session
+from time import sleep
 
 
 HOST = '127.0.0.1'
@@ -23,6 +24,8 @@ def connect():
         except Exception as e:
             print(e)
             print('连接聊天服务器时出错')
+            sleep(3)
+
 
     while True:
         try:
@@ -32,4 +35,6 @@ def connect():
             break
         except:
             print('连接文件服务器时出错')
+            sleep(3)
+
 

@@ -113,6 +113,9 @@ class login():
         self.label_id.grid(row=1,column=0)
         self.entry_id = Entry(self.frame_function)
         self.entry_id.focus_set()
+
+        self.entry_id.insert(END, '7')
+
         self.entry_id.grid(row=1,column=1)
 
 
@@ -124,6 +127,9 @@ class login():
         self.label_passwd = Label(self.frame_function, text='密码:')
         self.label_passwd.grid(row=3, column=0)
         self.entry_passwd = Entry(self.frame_function)
+
+        self.entry_passwd.insert(END, '123')
+
         self.entry_passwd.grid(row=3, column=1)
         #注册
         self.button_register = Button(self.frame_function, text='注册', command=self.register)
