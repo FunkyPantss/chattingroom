@@ -2,6 +2,7 @@
 import os
 import hashlib
 import struct
+import GUI.chat_window
 
 BUFFER_SIZE = 1024
 HEAD_STRUCT = '128sIq32s'
@@ -39,6 +40,8 @@ def send_file_to_server(file_path, tcpCliSock):
                 send_file = fr.read(send_size)
                 sent_size += send_size
                 tcpCliSock.send(send_file)
+        #文件传输结束
+
     except Exception as e:
         print("Socket error: %s" % str(e))
     finally:

@@ -73,28 +73,28 @@
 #
 
 from tkinter import *
+from PIL import Image, ImageTk
+
 
 root = Tk()
-root.geometry('400x300')
 
+#photo = ImageTk.PhotoImage(Image.open('./emoji_file/a1.png'))
+photo = PhotoImage(file='./emoji_file/test.GIF')
+text = Text(root)
 
-photo = PhotoImage(file='./emoji_file/test.GIF', name='12')
-print(photo)
-te = Text(root)
+#text.tag_config('a', background = 'green')
+text.insert(END, 'abcd')
+text.image_create(END, image=photo)
+text.insert(END, 'abcd')
 
-te.tag_config('a', background = 'green')
-te.insert(END, '/ue41582112323', 'a')
-te.image_create(END, image=photo)
-# te.mark_set('a', CURRENT)
-# te.mark_gravity('a', LEFT)
-# print(te.get('a', CURRENT))
-te.mark_set('a',  END)
-print(CURRENT)
+#text.mark_set('a',  END)
+#print(CURRENT)
 
-print(photo.cget(option='file'))#file,gamma可用
-#print(te.image_cget(1.0, option='file'))
-print(te.get(1.0, END))
-te.pack()
+#print(photo.cget(option='file'))#file,gamma可用
+print(text.get(1.0, END))
+text.pack()
+top = Tk()
+top.mainloop()
 
 
 root.mainloop()

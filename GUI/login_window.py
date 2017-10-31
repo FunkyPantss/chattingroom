@@ -1,11 +1,11 @@
-import login_code
 from tkinter import *
 from GUI import friend_list
 import tkinter.messagebox
 import session
 import pymysql
-import time
 from GUI import connect_to_server
+import time
+import rsa
 
 class login():
     def denglu(self):
@@ -14,21 +14,69 @@ class login():
         while user_id != '' and passwd != '':
             user_id = self.entry_id.get()
             passwd = self.entry_passwd.get()
-            if login_code.login(user_id, passwd):#登录成功,进入下一个界面
+            # if login_code.login(user_id, passwd):#登录成功
+            #     self.root.destroy()
+            #     friend_list.top()
+            # 全局设置user_id
+
+            session.USER_ID = user_id
+            # 查询数据
+            sql = "SELECT user_id,passwd FROM Users WHERE user_id= " + session.USER_ID + ' AND passwd=' + passwd
+            print(sql)
+            session.CURSOR.execute(sql)
+            if session.CURSOR.rowcount:
+                print('登录成功')
                 self.root.destroy()
-                #在登录成功后就先连接聊天服务器和文件服务器
-                connect_to_server.connect()
                 friend_list.top()
-
-            else:#登录失败
+                # return True
+            else:
                 tkinter.messagebox.showerror('登录失败', '账号或密码错误，请重新输入')
-                pass
+                # return False
 
+            # else:#登录失败
+            #     tkinter.messagebox.showerror('登录失败', '账号或密码错误，请重新输入')
+            #     pass
+
+            #加密并发送到服务器的方法
+            # message = user_id + ':' + passwd
+            # crypto = rsa.encrypt(message, session.pubkey)
+            # print(crypto)
+            # session.chat_tcpCliSock.send(crypto.encode('utf-8'))
+            #
+            # while True:
+            #     result = session.chat_tcpCliSock.recv(1024)
+            #     if not result:
+            #         break
+
+            # 登陆成功,进入下一个界面
+            # if result == 1:
+            #     self.root.destroy()
+            #     friend_list.top()
+            # else:#登录失败
+            #     tkinter.messagebox.showerror('登录失败', '账号或密码错误，请重新输入')
 
     def register(self):
-        #首先取消下方登录按钮的显示，把注册按钮显示到第1列
+        def exit_():
+            #取消用户名的显示
+            self.label_username.grid_forget()
+            self.entry_username.grid_forget()
+
+            #显示登录按钮
+            self.button_exit.grid_forget()
+
+            self.button_register.grid(row=4, column=0)
+            self.button_login.grid(row=4, column=1, sticky='e')
+
+
+
+
+        #首先取消下方登录按钮的显示
         self.button_login.grid_forget()
+        #显示一个返回按钮，把注册按钮显示到第1列
+        self.button_exit = Button(self.frame_function, text='返回', command=exit_)
+        self.button_exit.grid(row=4, column=0)
         self.button_register.grid(row=4, column=1)
+
         #再插入一行用于输入用户名
         self.label_username.grid(row=2, column=0)
         self.entry_username.grid(row=2, column=1)
@@ -94,29 +142,43 @@ class login():
 
 
     def __init__(self):
+
+        # 尝试连接服务器，为下一步传递账号密码做准备
+        connect_to_server.connect()
+        while True:
+            try:
+
+                print('连接服务器成功')
+                break
+            except:
+                print('连接服务器失败,尝试重连……')
+                time.sleep(5)
+
+
         self.root = Tk()
         self.root.geometry('422x278+450+250')
         self.root.title('QQ')
 
 
         #上方——图片
-        self.frame = Frame(self.root, bg='blue')
-        self.frame.pack(side=TOP, fill=BOTH, expand=1)
+        photo = PhotoImage(file='qq.GIF')
+        self.label = Label(self.root, bg='white', image=photo)
+        self.label.pack(side=TOP, fill=BOTH)
 
 
         #下方——功能
-        self.frame_function = Frame(self.root, bg='red', height=30)
-        self.frame_function.pack(side=BOTTOM, fill=BOTH, expand=1)
+        self.frame_function = Frame(self.root, bg='white', height=30)
+        self.frame_function.pack(side=TOP)
 
         #账号
         self.label_id = Label(self.frame_function, text='账号:')
-        self.label_id.grid(row=1,column=0)
+        self.label_id.grid(row=1,column=0, sticky='n')
         self.entry_id = Entry(self.frame_function)
         self.entry_id.focus_set()
 
         self.entry_id.insert(END, '7')
 
-        self.entry_id.grid(row=1,column=1)
+        self.entry_id.grid(row=1, column=1)
 
 
         #用户名(先定义，在这里不显示,应显示在第二行）
@@ -138,7 +200,6 @@ class login():
         #登录
         self.button_login = Button(self.frame_function, text='登录', command=self.denglu)
         self.button_login.grid(row=4, column=1, sticky='e')
-
 
 
         self.root.mainloop()

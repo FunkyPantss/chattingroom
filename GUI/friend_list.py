@@ -16,12 +16,12 @@ class top():
         # chat = Toplevel()
         pass
 
-    def printList(self, event):
-        print('选择了' + str(self.listbox_friend.get(self.listbox_friend.curselection())))
+    def selected_friend(self, event):
+        #print('选择了' + str(self.listbox_friend.get(self.listbox_friend.curselection())))
         session.FRIEND_NAME = str(self.listbox_friend.get(self.listbox_friend.curselection()))
         session.FRIEND_ID = str(self.name_id[session.FRIEND_NAME])
-        print('现在friendname是' + session.FRIEND_NAME)
-        print('现在friendID是' + session.FRIEND_NAME)
+        #print('现在friendname是' + session.FRIEND_NAME)
+        #print('现在friendID是' + session.FRIEND_NAME)
         # self.chat = Tk()
         # self.chat.geometry('700x500+450+250')
         # self.chat.title(self.listbox_friend.get(self.listbox_friend.curselection()))
@@ -29,6 +29,11 @@ class top():
 
         # 在这里启动发送消息和接受消息的线程
         chat_window.chat()  # 打开聊天窗口
+
+    def selected_group(self):
+        session.GROUP_NAME = str(self.listbox_group.get(self.listbox_group.curselection()))
+        session.GROUP_ID = str(self.name_id[session.GROUP_NAME])
+        chat_window.chat()
 
     def showfriend(self):
         # 取消群列表显示
@@ -60,6 +65,17 @@ class top():
                 self.listbox_friend.insert(END, info[1])
         except:
             print('从数据库中取好友列表时出错')
+
+    def refresh_group(self):
+        sql = 'SELECT group_id,group_name FROM ' + session.USER_ID + '_group'
+        try:
+            session.CURSOR.execute(sql)
+            self.infos_group = session.CURSOR.fetchall()
+            for info in self.infos_group:
+                self.group_id[info[1]] = info[0]
+                self.listbox_group.insert(END, info[1])
+        except:
+            print('从数据库中取群列表时出错')
 
     def __init__(self):
 
@@ -103,7 +119,7 @@ class top():
         self.name_id = {}
         self.refresh_friend()
 
-        self.listbox_friend.bind('<Double-Button-1>', self.printList)  # 给listbox_friend绑定事件
+        self.listbox_friend.bind('<Double-Button-1>', self.selected_friend)  # 给listbox_friend绑定事件
 
         # 中部——群列表
         self.scroll_group = Scrollbar(self.frame, orient=VERTICAL)
@@ -111,19 +127,25 @@ class top():
         self.listbox_group.config(selectmode=BROWSE, yscrollcommand=self.scroll.set, bd=1, font=20, height=20,
                                   width=20)
         self.scroll_group.config(command=self.listbox_group.yview)
+
+        self.group_id = {}
+        self.refresh_group()
+
+        self.listbox_group.bind('<Double-Button-1>', self.selected_group)  # 给listbox_friend绑定事件
+
+
         # 默认先显示好友列表，这两行到showgroup中调用
         # self.scroll_group.pack(side=RIGHT, fill=BOTH)
         # self.listbox_group.pack(fill=BOTH, expand=1)
-        for item in range(50, 100):
-            self.listbox_group.insert(END, item)
+        # for item in range(50, 100):
+        #     self.listbox_group.insert(END, item)
 
-        self.listbox_group.bind('<Double-Button-1>', self.printList)  # 给listbox_friend绑定事件
         #
         # 最下方——添加好友
         self.label_add = Button(self.root, relief=SUNKEN, anchor=W, bd=1)  # W是West对齐，即左对齐;bd是border
         self.label_add.pack(side=BOTTOM, fill=X, ipady=10)
 
-        self.button_add = Button(self.label_add, text='查找', command=lambda :add_friend.add_function() )
+        self.button_add = Button(self.label_add, text='查找', command=lambda :add_friend.add_function())
         self.button_add.grid(sticky='w')
 
         self.root.mainloop()

@@ -61,13 +61,28 @@ class add_function():
             self.label_info.config(text='失败!')
 
     def find_group(self):
+        def addgroup():
+            #在用户自己的表中插入群号，在群中加入用户ID
+            sql_user = 'INSERT user_id,group_id,group_name INTO ' +session.USER_ID
+
+
         number = self.entry.get()
         # sql = 'SELECT user_id FROM users WHERE groups =' + number + ';'
-        sql = 'SELECT * FROM users'
+        sql = 'SELECT * FROM groups'
         session.CURSOR.execute(sql)
 
         if session.CURSOR.rowcount:
             self.label_info.config(text='成功!')
+
+            self.label.config(text='群名称：' + self.info[1])
+            self.label.grid(row=1)
+
+            self.label_2.config(text='群账号：' + str(self.info[0]))
+            self.label_2.grid(row=2)
+
+            self.button = Button(self.label_info_bottom, command=addgroup)
+            self.button.config(text='添加好友')
+            self.button.grid(row=3)
         else:
             print('失败')
             self.label_info.config(text='失败!')

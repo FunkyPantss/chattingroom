@@ -55,7 +55,9 @@ def recv():
             print('MD5 compared fail!')
         else:
             print('Received successfully')
+            return file_name
 
     except Exception as e:
         print("Socket error: %s" % str(e))
+        return False
 

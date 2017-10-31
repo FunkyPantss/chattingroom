@@ -21,7 +21,6 @@ def login(user_id, passwd):
         if session.CURSOR.rowcount:
             print('登录成功')
             return True
-            break
         else:
             print("登录失败，请重新登录")
             return False

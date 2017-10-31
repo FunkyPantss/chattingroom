@@ -1,10 +1,15 @@
 import pymysql
 
+pubkey = ''
+
 USER_ID = '7'
 USER_NAME = ''
 
 FRIEND_NAME = '11111'
 FRIEND_ID = '1'
+
+GROUP_NAME = '1'
+GROUP_ID = '1'
 
 chat_tcpCliSock = None
 file_tcpCliSock = None

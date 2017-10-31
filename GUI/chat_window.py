@@ -7,12 +7,20 @@ from PIL import Image, ImageTk
 import cilent_recv_file
 import file_client
 import session
+import rsa
 
 
 class chat():
     def send(self):
         message = self.textpad.get(1.0, END)
-        print(message)
+        self.textpad.delete(1.0, END)#清空发送窗口
+
+        #把自己发送的消息以红色时间显示
+        self.textpad.tag_config(self.time_color_red, background='red')
+        self.show_message.insert(self.mark, self.my_name + ' ')
+        self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'time_color_red')
+        self.show_message.insert(self.mark, message + '\n\n')
+
         try:
             session.chat_tcpCliSock.send(message.encode('utf-8'))
         except:
@@ -30,7 +38,9 @@ class chat():
                     print(file)
                     try:
                         self.show_message.config(state=NORMAL)
-                        self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'time_color')
+                        self.textpad.tag_config(self.time_color_green, background='green')
+                        self.show_message.insert(self.mark, self.friend_name + ' ')
+                        self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'time_color_green')
                         _emoji = ImageTk.PhotoImage(Image.open(file))
                         self.show_message.image_create(self.mark, image=_emoji)
                         self.show_message.insert(self.mark, '\n\n', 'time_color')
@@ -43,9 +53,11 @@ class chat():
                 else:  # 接收到了消息，在这里进行处理，显示
                     print(message.decode('utf-8'))
                     self.show_message.config(state=NORMAL)
-                    self.textpad.tag_config(self.time_color, background='green')
-                    self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'time_color')
+                    self.textpad.tag_config(self.time_color_green, background='green')
+                    self.show_message.insert(self.mark, self.friend_name + ' ')
+                    self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'time_color_green')
                     self.show_message.insert(self.mark, message.decode('utf-8') + '\n\n')
+
                     self.show_message.config(state=DISABLED)
 
             except:
@@ -56,11 +68,20 @@ class chat():
 
     def send_file(self):
         filename = tkinter.filedialog.askopenfile()  # defaultextension='.txt'
+        # file_name = os.path.basename(file_path)
+
+        print(str(filename.name))
+        print(filename.name)
         file_client.send_file(filename.name, session.file_tcpCliSock)
+        self.show_message.insert(self.mark, self.my_name + ' ')
+        self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'time_color_red')
+        self.show_message.insert(self.mark, "\"" + str(filename.name) + "\"" + '文件已成功发送')
+
 
 
     def receive_file(self):
-        cilent_recv_file.recv()
+        if cilent_recv_file.recv():#返回值为文件名
+            self.show_message.insert(self.mark, "接收到文件：" + str(cilent_recv_file.recv()))
 
     def emoji(self):
         #取得当前光标位置，插入图片
@@ -77,184 +98,183 @@ class chat():
             except:
                 print('表情发送失败')
 
-        photo1 = ImageTk.PhotoImage(Image.open(self.rootdir + 'a1.png'))
-        button = Button(top, image=photo1, command=lambda: send_emoji(self.rootdir + 'a1.png'))
-        print(self.textpad.mark_names())
-        button.image = photo1
+        photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a1.png'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a1.png'))
+        button.image = photo
         button.grid(row=0, column=1)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a2.png'))
-        button = Button(top, image=photo, command=lambda: 'a2')
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a2.png'))
         button.image = photo
         button.grid(row=0, column=2)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a3.png'))
-        button = Button(top, image=photo, command=lambda: print('a3'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a3.png'))
         button.image = photo
         button.grid(row=0, column=3)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a4.png'))
-        button = Button(top, image=photo, command=lambda: print('a4'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a4.png'))
         button.image = photo
         button.grid(row=0, column=4)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a5.png'))
-        button = Button(top, image=photo, command=lambda: print('a5'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a5.png'))
         button.image = photo
         button.grid(row=0, column=5)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a6.png'))
-        button = Button(top, image=photo, command=lambda: print('a6'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a6.png'))
         button.image = photo
         button.grid(row=0, column=6)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a7.png'))
-        button = Button(top, image=photo, command=lambda: print('a7'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a7.png'))
         button.image = photo
         button.grid(row=0, column=7)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a8.png'))
-        button = Button(top, image=photo, command=lambda: print('a8'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a8.png'))
         button.image = photo
         button.grid(row=0, column=8)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a9.png'))
-        button = Button(top, image=photo, command=lambda: print('a9'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a9.png'))
         button.image = photo
         button.grid(row=0, column=9)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a10.png'))
-        button = Button(top, image=photo, command=lambda: print('a10'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a10.png'))
         button.image = photo
         button.grid(row=0, column=10)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a11.png'))
-        button = Button(top, image=photo, command=lambda: print('a11'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a11.png'))
         button.image = photo
         button.grid(row=0, column=11)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'a12.png'))
-        button = Button(top, image=photo, command=lambda: print('a12'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'a12.png'))
         button.image = photo
         button.grid(row=0, column=12)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b1.png'))
-        button = Button(top, image=photo, command=lambda: print('b1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b1.png'))
         button.image = photo
         button.grid(row=1, column=1)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b2.png'))
-        button = Button(top, image=photo, command=lambda: print('b2'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b2.png'))
         button.image = photo
         button.grid(row=1, column=2)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b3.png'))
-        button = Button(top, image=photo, command=lambda: print('b3'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b3.png'))
         button.image = photo
         button.grid(row=1, column=3)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b4.png'))
-        button = Button(top, image=photo, command=lambda: print('b4'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b4.png'))
         button.image = photo
         button.grid(row=1, column=4)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b5.png'))
-        button = Button(top, image=photo, command=lambda: print('b5'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b5.png'))
         button.image = photo
         button.grid(row=1, column=5)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b6.png'))
-        button = Button(top, image=photo, command=lambda: print('b6'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b6.png'))
         button.image = photo
         button.grid(row=1, column=6)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b7.png'))
-        button = Button(top, image=photo, command=lambda: print('b7'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b7.png'))
         button.image = photo
         button.grid(row=1, column=7)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b8.png'))
-        button = Button(top, image=photo, command=lambda: print('b8'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b8.png'))
         button.image = photo
         button.grid(row=1, column=8)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b9.png'))
-        button = Button(top, image=photo, command=lambda: print('b9'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b9.png'))
         button.image = photo
         button.grid(row=1, column=9)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b10.png'))
-        button = Button(top, image=photo, command=lambda: print('b10'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b10.png'))
         button.image = photo
         button.grid(row=1, column=10)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b11.png'))
-        button = Button(top, image=photo, command=lambda: print('b11'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b11.png'))
         button.image = photo
         button.grid(row=1, column=11)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'b12.png'))
-        button = Button(top, image=photo, command=lambda: print('b12'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'b12.png'))
         button.image = photo
         button.grid(row=1, column=12)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c1.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c1.png'))
         button.image = photo
         button.grid(row=2, column=1)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c2.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c2.png'))
         button.image = photo
         button.grid(row=2, column=2)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c3.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c3.png'))
         button.image = photo
         button.grid(row=2, column=3)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c4.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c4.png'))
         button.image = photo
         button.grid(row=2, column=4)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c5.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c5.png'))
         button.image = photo
         button.grid(row=2, column=5)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c6.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c6.png'))
         button.image = photo
         button.grid(row=2, column=6)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c7.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c7.png'))
         button.image = photo
         button.grid(row=2, column=7)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c8.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c8.png'))
         button.image = photo
         button.grid(row=2, column=8)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c9.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c9.png'))
         button.image = photo
         button.grid(row=2, column=9)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c10.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c10.png'))
         button.image = photo
         button.grid(row=2, column=10)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c11.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c11.png'))
         button.image = photo
         button.grid(row=2, column=11)
 
         photo = ImageTk.PhotoImage(Image.open(self.rootdir + 'c12.png'))
-        button = Button(top, image=photo, command=lambda: print('c1'))
+        button = Button(top, image=photo, command=lambda: send_emoji(self.rootdir + 'c12.png'))
         button.image = photo
         button.grid(row=2, column=12)
 
@@ -263,8 +283,13 @@ class chat():
 
     def __init__(self):
         #self.rootdir ='e:/python/chatroomforgit/emoji_file/'
+        self.friend_name = session.FRIEND_NAME
+        self.my_name = session.USER_NAME
+
         self.rootdir = '../emoji_file/'
-        self.time_color = 'time_color'
+        self.time_color_green = 'time_color_green'
+        self.time_color_red = 'time_color_red'
+
 
         # 向服务器发送第一条消息，使用格式userid:friendid
         userid_friendid = session.USER_ID + ':' + session.FRIEND_ID

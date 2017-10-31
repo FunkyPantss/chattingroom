@@ -19,7 +19,16 @@ def connect():
         try:
             session.chat_tcpCliSock = socket(AF_INET, SOCK_STREAM)
             session.chat_tcpCliSock.connect(CHAT_ADDR)
+            #session.chat_tcpCliSock.send('11111'.encode('utf-8'))
             print('成功连接到聊天服务器')
+            #协商密钥,从服务器接受的第一条消息是公钥
+            #while True:
+            session.pubkey = session.chat_tcpCliSock.recv(1024)
+            print(session.pubkey)
+                #print(session.pubkey.decode('utf-8'))
+                # if not session.pubkey:
+                #     break#
+            print(1)
             break
         except Exception as e:
             print(e)
