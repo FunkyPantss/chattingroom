@@ -11,23 +11,19 @@ import rsa
 
 
 class chat():
-    def send_friend(self):
+    def send_group(self):
         message = self.textpad.get(1.0, END)
         self.textpad.delete(1.0, END)#清空发送窗口
 
         #把自己发送的消息以红色时间显示
-
-        self.show_message.tag_config('red', background='red')
-
-        self.show_message.config(state=NORMAL)
-        self.show_message.insert(self.mark, self.my_name + ' ', 'red')
-        self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'red')
+        self.textpad.tag_config(self.time_color_red, background='red')
+        self.show_message.insert(self.mark, self.my_name + ' ')
+        self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'time_color_red')
         self.show_message.insert(self.mark, message + '\n\n')
-        self.show_message.config(state=DISABLED)
 
         try:
             #使用公钥加密,只能对字节类性加密
-            message = str(session.FRIEND_ID) + ':' + message
+            message = str(session.GROUP_ID) + ':' + message
             crypto = rsa.encrypt(message.encode('utf-8'), session.pubkey)
             session.chat_tcpCliSock.send(crypto)
         except EXCEPTION as e:
@@ -39,8 +35,8 @@ class chat():
             try:
                 message = session.chat_tcpCliSock.recv(1024)# 接收到的是密文
                 #message = rsa.decrypt(crypto, session.privatekey)# byte类型
-                print(message.decode('utf-8').split('-')[0])
-                print(message.decode('utf-8').split('-')[-1])
+                # print(message.decode('utf-8').split('-')[0])
+                # print(message.decode('utf-8').split('-')[-1])
 
                 if not message:
                     break
@@ -53,10 +49,9 @@ class chat():
                     file = message.decode('utf-8').split('-')[-1]
                     try:
                         self.show_message.config(state=NORMAL)
-                        #self.textpad.tag_config(self.time_color_green, background='green')
-                        self.show_message.tag_config('green', background='green')
-                        self.show_message.insert(self.mark, self.friend_name + ' ', 'green')
-                        self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'green')
+                        self.textpad.tag_config(self.time_color_green, background='green')
+                        self.show_message.insert(self.mark, self.friend_name + ' ')
+                        self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'time_color_green')
                         _emoji = ImageTk.PhotoImage(Image.open(file))
                         self.show_message.image_create(self.mark, image=_emoji)
                         self.show_message.insert(self.mark, '\n\n', 'time_color')
@@ -69,9 +64,9 @@ class chat():
                 else:  # 接收到了消息，在这里进行处理，显示
                     print(message.decode('utf-8'))
                     self.show_message.config(state=NORMAL)
-                    self.show_message.tag_config('green', background='green')
-                    self.show_message.insert(self.mark, self.friend_name + ' ', 'green')
-                    self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'green')
+                    self.textpad.tag_config(self.time_color_green, background='green')
+                    self.show_message.insert(self.mark, self.friend_name + ' ')
+                    self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'time_color_green')
                     self.show_message.insert(self.mark, message.decode('utf-8') + '\n\n')
 
                     self.show_message.config(state=DISABLED)
@@ -86,9 +81,9 @@ class chat():
         try:
             filename = tkinter.filedialog.askopenfile()  # defaultextension='.txt'
             # file_name = os.path.basename(file_path)
+
+            print(str(filename.name))
             print(filename.name)
-
-
             file_client.send_file(filename.name, session.file_tcpCliSock)
             self.show_message.insert(self.mark, self.my_name + ' ')
             self.show_message.insert(self.mark, '[' + time.strftime('%H:%M:%S', time.localtime()) + ']  ', 'time_color_red')
@@ -112,7 +107,7 @@ class chat():
             #构造发送语句
             text = 'emoji-' + photo
             try:
-                text = rsa.encrypt((session.FRIEND_ID + ':' + text).encode('utf-8'), session.pubkey)
+                text = rsa.encrypt((session.GROUP_ID + ':' + text).encode('utf-8'), session.pubkey)
                 session.chat_tcpCliSock.send(text)
             except:
                 print('表情发送失败')
@@ -357,7 +352,6 @@ class chat():
         #mark,tag
         self.textpad.mark_set('mark', CURRENT)
 
-
         # 添加表情、文件、发送按钮
         self.button_emoji = Button(self.lable_function, text='表情', bd=1, bg='red', command=self.emoji)
         # self.button_emoji.grid(row=0, column=1)
@@ -367,7 +361,7 @@ class chat():
         # self.button_file.grid(row=0, column=2)
         self.button_file.pack(side=LEFT, fill=Y)
 
-        self.button_send = Button(self.lable_function, text='发送', bd=1, bg='blue', command=self.send_friend)
+        self.button_send = Button(self.lable_function, text='发送', bd=1, bg='blue', command=self.send_group)
         # self.button_send.grid(row=0, column=3, sticky='E')
         self.button_send.pack(side=RIGHT, fill=Y)
 

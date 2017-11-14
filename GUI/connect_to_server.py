@@ -1,6 +1,7 @@
 from socket import *
 import session
 from time import sleep
+import rsa
 
 
 HOST = '127.0.0.1'
@@ -23,7 +24,10 @@ def connect():
             print('成功连接到聊天服务器')
             #协商密钥,从服务器接受的第一条消息是公钥
             #while True:
-            session.pubkey = session.chat_tcpCliSock.recv(1024)
+            pub = session.chat_tcpCliSock.recv(1024)
+            session.pubkey = rsa.PublicKey.load_pkcs1(pub)
+
+
             print(session.pubkey)
                 #print(session.pubkey.decode('utf-8'))
                 # if not session.pubkey:

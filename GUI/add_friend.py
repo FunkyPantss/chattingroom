@@ -1,6 +1,7 @@
 import pymysql
 import session
 from tkinter import *
+import tkinter.messagebox
 from GUI import friend_list
 
 
@@ -23,18 +24,24 @@ class add_function():
         def makefriend():
             sql = 'INSERT INTO ' + str(int(session.USER_ID)) + "_friend VALUES(%d, '%s', 1);"
             try:
-                print(type(self.info[0]))
-                print(type(self.info[1]))
-                print(str(self.info[1]))
+                print(self.info[0])
+                print(self.info[1])
                 print(sql % (self.info[0], str(self.info[1])))
                 session.CURSOR.execute(sql % (self.info[0], str(self.info[1])))
                 session.connect.commit()
+                print('commit成功')
                 # 在好友列表中添加最新的好友
 
-                friend_list.top.name_id[self.info[1]] = self.info[0]
-                friend_list.top.listbox_friend.insert(END, self.info[1])
+                # friend_list.top.name_id[self.info[1]] = self.info[0]
+                # friend_list.top.listbox_friend.insert(END, self.info[1])
+                # friend_list.top.refresh_friend()
 
-                self.label_3.config(text='成功添加好友!')
+                #self.label_3.config(text='成功添加好友!')
+                tkinter.messagebox.showinfo('成功', '成功添加好友！')
+                self.root.destroy()
+                print('destroy成功')
+                #return
+
             except pymysql.err.IntegrityError:
                 self.label_3.config(text='该用户已经是你的好友了!')
             except EXCEPTION as e:

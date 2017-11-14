@@ -6,6 +6,7 @@ import pymysql
 from GUI import connect_to_server
 import time
 import rsa
+import hashlib
 
 class login():
     def denglu(self):
@@ -14,6 +15,9 @@ class login():
         while user_id != '' and passwd != '':
             user_id = self.entry_id.get()
             passwd = self.entry_passwd.get()
+
+            #hash
+            passwd = hashlib.md5(passwd.encode('utf-8')).hexdigest()
             # if login_code.login(user_id, passwd):#登录成功
             #     self.root.destroy()
             #     friend_list.top()
@@ -21,16 +25,23 @@ class login():
 
             session.USER_ID = user_id
             # 查询数据
-            sql = "SELECT user_id,passwd FROM Users WHERE user_id= " + session.USER_ID + ' AND passwd=' + passwd
+            sql = "SELECT user_id, passwd FROM users WHERE user_id= " + session.USER_ID + ' AND passwd=\'' + passwd + '\''
             print(sql)
             session.CURSOR.execute(sql)
+            print(session.CURSOR.rowcount)
             if session.CURSOR.rowcount:
                 print('登录成功')
+                session.chat_tcpCliSock.send(session.USER_ID.encode('utf-8'))
                 self.root.destroy()
-                friend_list.top()
+                try:
+                    friend_list.top()
+                except:
+                    pass
                 # return True
             else:
                 tkinter.messagebox.showerror('登录失败', '账号或密码错误，请重新输入')
+                user_id = ''
+                passwd = ''
                 # return False
 
             # else:#登录失败
@@ -90,9 +101,10 @@ class login():
             user_name = self.entry_username.get()
             passwd = self.entry_passwd.get()
 
+            #对密码hash
+            passwd = hashlib.md5(passwd.encode('utf-8')).hexdigest()
 
-
-            sql = "INSERT INTO Users (user_id, user_name, passwd) VALUES ( '%d', '%s', %s )"
+            sql = "INSERT INTO users (user_id, user_name, passwd) VALUES ( '%d', '%s', '%s' )"
             data = (int(user_id), user_name, passwd)
             print(data)
             try:
@@ -109,7 +121,8 @@ class login():
                 break
 
 
-            except:
+            except EXCEPTION as e:
+                print(e)
                 print('register()出现其他错误')
                 break
 
@@ -188,7 +201,7 @@ class login():
         #密码
         self.label_passwd = Label(self.frame_function, text='密码:')
         self.label_passwd.grid(row=3, column=0)
-        self.entry_passwd = Entry(self.frame_function)
+        self.entry_passwd = Entry(self.frame_function, show='*')
 
         self.entry_passwd.insert(END, '123')
 

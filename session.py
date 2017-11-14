@@ -1,6 +1,7 @@
 import pymysql
 
 pubkey = ''
+privatekey = ''
 
 USER_ID = '7'
 USER_NAME = ''
@@ -19,7 +20,7 @@ connect = pymysql.Connect(
     host='localhost',
     port=3306,
     user='root',
-    passwd='qinchuan',
+    passwd='123456',
     db='ChattingRoom',
     charset='utf8'
 )

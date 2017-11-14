@@ -2,7 +2,6 @@
 import os
 import hashlib
 import struct
-import GUI.chat_window
 
 BUFFER_SIZE = 1024
 HEAD_STRUCT = '128sIq32s'
@@ -27,10 +26,12 @@ def get_file_info(file_path):
 def send_file_to_server(file_path, tcpCliSock):
     file_name, file_name_len, file_size, md5 = get_file_info(file_path)
     file_head = struct.pack(HEAD_STRUCT, file_name.encode('utf-8'), file_name_len, file_size, md5.encode('utf-8'))
-
+    print('file_head')
+    print(file_head)
     try:
         print("Start connect")
         tcpCliSock.send(file_head)
+        print(file_head)
         sent_size = 0
 
         with open(file_path, 'rb') as fr:

@@ -29,6 +29,7 @@ def cal_md5(file_path):
 
 
 def unpack_file_info(file_info):
+    print(type(file_info))
     file_name, file_name_len, file_size, md5 = struct.unpack(HEAD_STRUCT, file_info)
     file_name = file_name[:file_name_len]
     return file_name, file_size, md5
@@ -41,6 +42,7 @@ def recv_file(id, tcpCliSock_i):
         tcpCliSock_i.send(file_info_package)
         #解包
         file_name, file_size, md5_recv = unpack_file_info(file_info_package)
+        print(file_name)
 
         recved_size = 0
         with open(file_name.decode('utf-8'), 'wb') as fw:
@@ -62,7 +64,8 @@ def recv_file(id, tcpCliSock_i):
         else:
             print('Received successfully')
     except Exception as e:
-        print("Socket error: %s" % str(e))
+        #print("Socket error: %s" % str(e))
+        pass
 
 
 def p2p(id, recv_stream):
@@ -76,6 +79,7 @@ def p2p(id, recv_stream):
     else:
         pass#服务器继续存文件
 
+
 def is_online(id):#给出一个ID判断其是否在线，如果在线返回True
     if id in user_online.keys():
         return True
@@ -85,25 +89,30 @@ def is_online(id):#给出一个ID判断其是否在线，如果在线返回True
 
 if __name__ == '__main__':
 
-    print('文件服务器正在等待客户端连接...')
     while True:
-        tcpCliSock, addr = tcpSerSock.accept()
-        print('客户端', addr[0], ':', str(addr[1]), '已连接\t')
-
-
+        print('文件服务器正在等待客户端连接...')
         try:
+            tcpCliSock, addr = tcpSerSock.accept()
+            print('客户端', addr[0], ':', str(addr[1]), '已连接\t')
+
+
+            # try:
             userid_friendid = tcpCliSock.recv(BUFFERSIZE).decode('utf-8')  # 客户机的第一条消息是客户机名字
-        except:
-            # print('客户端已断开连接')
-            # break
-            print('接受消息错误')
-        user_id, friend_id = userid_friendid.split(':')
-        print('user_id:' + user_id)
-        print('friend_id:' + friend_id)
+            print(userid_friendid)
+            # except:
+                # print('客户端已断开连接')
+                # break
+            #print('接受消息错误')
+            user_id, friend_id = userid_friendid.split(':')
+            print('user_id:' + user_id)
+            print('friend_id:' + friend_id)
 
-        user_online[user_id] = tcpCliSock
+            user_online[user_id] = tcpCliSock
 
-        # print('user_name is [' + user_name +']')#连接前一条end=''的print语句
+            # print('user_name is [' + user_name +']')#连接前一条end=''的print语句
 
-        threading.Thread(target=recv_file, args=(friend_id, tcpCliSock)).start()
-        # _thread.start_new_thread(receive, (friend_id, tcpCliSock))
+            threading.Thread(target=recv_file, args=(friend_id, tcpCliSock)).start()
+            # _thread.start_new_thread(receive, (friend_id, tcpCliSock))
+        except Exception as e:
+            print(e)
+            pass

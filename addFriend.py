@@ -4,7 +4,7 @@ while True:
     friend_id = input("请输入好友账号：")
 
     # 查询数据
-    sql = "SELECT user_id FROM Users WHERE user_id= " + friend_id
+    sql = "SELECT user_id FROM users WHERE user_id= " + friend_id
     print(sql)
     session.CURSOR.execute(sql)
     if friend_id == session.USER_ID:
